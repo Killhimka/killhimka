@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Employee</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 80vh; background-color: #f4f4f4; }
+        .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h1 { text-align: center; margin-bottom: 30px; color: #333; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input[type="text"], input[type="number"], input[type="email"] {
+            width: calc(100% - 20px); /* Учитываем padding */
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Для правильного расчета ширины */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message { margin-top: 20px; padding: 12px; border-radius: 4px; text-align: center; }
+        .success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        a { display: block; text-align: center; margin-top: 25px; text-decoration: none; color: #007bff; font-size: 14px; }
+        .hidden { display: none; } /* Для скрытого элемента ID, если нужен */
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Edit Employee</h1>
+
+    <div>
+        <!-- Скрытое поле для ID сотрудника, если нужно для JS -->
+        <input type="hidden" id="employeeIdInput" />
+
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" placeholder="e.g., Иван Петров" required />
+
+        <label for="age">Age:</label>
+        <input type="number" id="age" placeholder="e.g., 30" required min="18"/>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" placeholder="e.g., ул. Пушкина, д. Колотушкина" required />
+
+        <label for="position">Position:</label>
+        <input type="text" id="position" placeholder="e.g., Software Engineer" required />
+
+        <button id="saveButton">Save Changes</button>
+        <div id="responseMessage" class="message"></div>
+    </div>
+
+    <!-- Ссылка обратно на список сотрудников -->
+    <a href="/employees">Back to Employee List</a>
+</div>
+
+<script>
+    // Получаем ID сотрудника из URL.
+    // Thymeleaf передает employeeId как переменную в модель.
+    // [[${employeeId}]] - это синтаксис Thymeleaf для вставки значения переменной.
+    // Если employeeId не будет найдено, [[${employeeId}]] может стать 'null' как строка.
+    const employeeId = "[[${employeeId}]]";
+
+    const nameInput = document.getElementById('name');
+    const ageInput = document.getElementById('age');
+    const addressInput = document.getElementById('address');
+    const positionInput = document.getElementById('position');
+    const employeeIdInput = document.getElementById('employeeIdInput'); // Для скрытого поля
+    const responseMessage = document.getElementById('responseMessage');
+
+    // Функция для загрузки данных сотрудника для редактирования
+    async function loadEmployeeData() {
+        // Проверяем, получен ли ID. Если нет, выводим ошибку.
+        if (!employeeId || employeeId === 'null' || employeeId === 'undefined') {
+            responseMessage.textContent = 'Error: Employee ID is missing.';
+            responseMessage.className = 'message error';
+            // Можно также отключить форму или кнопки, если ID не получен
+            document.getElementById('saveButton').disabled = true;
+            return;
+        }
+
+        // Заполняем скрытое поле, если оно нужно для каких-то операций
+        employeeIdInput.value = employeeId;
+
+        try {
+            // Отправляем GET-запрос на REST API endpoint для получения данных сотрудника по ID
+            const response = await axios.get(`/v1/employees/${employeeId}`);
+            const employee = response.data;
+
+            // Заполняем поля формы полученными данными
+            nameInput.value = employee.name;
+            ageInput.value = employee.age;
+            addressInput.value = employee.address;
+            positionInput.value = employee.position;
+
+        } catch (error) {
+            console.error('Error loading employee data:', error);
+            let errorMessage = 'Failed to load employee data.';
+            if (error.response) {
+                // Пытаемся получить сообщение об ошибке от сервера
+                errorMessage = error.response.data?.message || `Server error ${error.response.status}`;
+                if (error.response.status === 404) {
+                    errorMessage = 'Employee not found.';
+                }
+            } else if (error.request) {
+                // Запрос был отправлен, но ответ не получен
+                errorMessage = 'No response from server.';
+            }
+            responseMessage.textContent = `Error: ${errorMessage}`;
+            responseMessage.className = 'message error';
+            // Отключаем кнопку сохранения, если произошла ошибка загрузки
+            document.getElementById('saveButton').disabled = true;
+        }
+    }
+
+    // Обработчик нажатия на кнопку сохранения
+    document.getElementById('saveButton').addEventListener('click', async () => {
+        const fullName = nameInput.value.trim();
+        const age = parseInt(ageInput.value);
+        const address = addressInput.value.trim();
+        const position = positionInput.value.trim();
+
+        // Клиентская валидация
+        if (!fullName || isNaN(age) || !address || !position || age < 18) {
+            responseMessage.textContent = 'Please fill in all fields correctly (Age must be 18+).';
+            responseMessage.className = 'message error';
+            return;
+        }
+
+        // Создаем объект для отправки на сервер
+        const employeeUpdateDto = {
+            name: fullName,
+            age: age,
+            address: address,
+            position: position
+        };
+
+        try {
+            // Отправляем PUT-запрос на обновление сотрудника
+            // Используем ID сотрудника, который мы получили ранее
+            const response = await axios.put(`/v1/employees/${employeeId}`, employeeUpdateDto, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            // Обработка успешного ответа
+            if (response.status === 200) { // OK - стандартный статус для успешного обновления
+                responseMessage.textContent = 'Employee updated successfully!';
+                responseMessage.className = 'message success';
+                // Перенаправляем на страницу списка сотрудников после успешного обновления
+                setTimeout(() => {
+                    window.location.href = '/employees'; // Переходим обратно на страницу списка
+                }, 1500); // Задержка перед перенаправлением
+            } else {
+                // Если статус не 200, но не ошибка (что маловероятно для PUT, но для безопасности)
+                responseMessage.textContent = response.data?.message || `Update failed with status: ${response.status}`;
+                responseMessage.className = 'message error';
+            }
+        } catch (error) {
+            // Обработка ошибок при отправке запроса
+            console.error('Error updating employee:', error);
+            let errorMessage = 'An error occurred during update.';
+            if (error.response) {
+                // Получаем сообщение об ошибке от сервера
+                errorMessage = error.response.data?.message || `Server error ${error.response.status}`;
+            } else if (error.request) {
+                // Запрос был отправлен, но ответ не получен
+                errorMessage = 'No response from server.';
+            }
+            responseMessage.textContent = `Error: ${errorMessage}`;
+            responseMessage.className = 'message error';
+        }
+    });
+
+    // Запускаем функцию загрузки данных при старте страницы
+    loadEmployeeData();
+</script>
+</body>
+</html>
