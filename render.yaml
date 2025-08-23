@@ -1,0 +1,47 @@
+# render.yaml
+
+services:
+  - type: web
+    name: killhimka
+    runtime: java
+    repo: https://github.com/Killhimka/killhimka.git
+    branch: master # Или 'main'
+
+    # Команда сборки Gradle
+    # bootJar создает исполняемый JAR-файл
+    buildCommand: "./gradlew bootJar"
+
+    # Команда запуска приложения
+    # Замените 'your-app-name.jar' на точное имя JAR-файла вашего проекта.
+    # Например: "java -jar build/libs/killhimka-0.0.1-SNAPSHOT.jar"
+    startCommand: "java -jar build/libs/killhimka-0.0.1-SNAPSHOT.jar"
+
+    # Переменные окружения
+    envVars:
+      # Указываем версию Java
+      - key: JAVA_VERSION
+        value: "17" # Убедитесь, что это соответствует вашей настройке в build.gradle.kts
+
+      # Настройки базы данных PostgreSQL
+      # Render автоматически подключит вас к внешней PostgreSQL, если она настроена
+      # Если вы используете Render Postgres (или внешнюю БД), используйте эти переменные.
+      # Если вы используете Render Postgres, Render предоставит вам эти переменные при создании сервиса БД.
+      - key: DATABASE_URL
+        value: "jdbc:postgresql://localhost:5432/killhimka" # Используйте URL вашей Render Postgres или внешнюю БД
+
+      - key: POSTGRES_USER
+        value: "postgres" # Используйте имя пользователя вашей Render Postgres или внешней БД
+
+      - key: POSTGRES_PASSWORD
+        value: "postgres" # Используйте пароль вашей Render Postgres или внешней БД
+
+      # Hibernate properties (можно переопределить через переменные окружения)
+      # Например, если вы хотите отключить show_sql в production:
+      # - key: SPRING_JPA_SHOW_SQL
+      #   value: "false"
+      # - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+      #   value: "update" # Или "validate" в production
+
+      # Если вы хотите переопределить порт, но Render обычно сам назначает порт
+      # - key: SERVER_PORT
+      #   value: "8085" # На Render порт может быть назначен автоматически.
