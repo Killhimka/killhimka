@@ -1,47 +1,28 @@
-# render.yaml
-
 services:
-  - type: web
-    name: killhimka
-    runtime: java
+  - type: web         # Это веб-сервис
+    name: killhimka # Имя вашего приложения на Render ( можете изменить )
+    runtime: java       # !!! Очень важно: Указываем, что это Java приложение !!!
     repo: https://github.com/Killhimka/killhimka.git
-    branch: main # Или 'main'
+    branch: master      # Ваша основная ветка (если у вас 'main', поменяйте)
 
-    # Команда сборки Gradle
-    # bootJar создает исполняемый JAR-файл
+    # Команда сборки Gradle для создания исполняемого JAR
     buildCommand: "./gradlew bootJar"
 
-    # Команда запуска приложения
-    # Замените 'your-app-name.jar' на точное имя JAR-файла вашего проекта.
-    # Например: "java -jar build/libs/killhimka-0.0.1-SNAPSHOT.jar"
+    # Команда запуска вашего Spring Boot приложения
+    # Убедитесь, что 'killhimka-0.0.1-SNAPSHOT.jar' - это точное имя файла в build/libs/
     startCommand: "java -jar build/libs/killhimka-0.0.1-SNAPSHOT.jar"
 
     # Переменные окружения
     envVars:
-      # Указываем версию Java
+      # Указываем версию Java, которую должен использовать Render
       - key: JAVA_VERSION
-        value: "17" # Убедитесь, что это соответствует вашей настройке в build.gradle.kts
+        value: "17" # Укажите вашу версию Java, например, 17, 11
 
-      # Настройки базы данных PostgreSQL
-      # Render автоматически подключит вас к внешней PostgreSQL, если она настроена
-      # Если вы используете Render Postgres (или внешнюю БД), используйте эти переменные.
-      # Если вы используете Render Postgres, Render предоставит вам эти переменные при создании сервиса БД.
+      # Настройки базы данных (укажите реальные данные вашей Render PostgreSQL!)
+      # Замените localhost:5432, postgres, postgres на данные вашей Render PostgreSQL базы данных.
       - key: DATABASE_URL
-        value: "jdbc:postgresql://localhost:5432/killhimka" # Используйте URL вашей Render Postgres или внешнюю БД
-
+        value: "jdbc:postgresql://YOUR_RENDER_POSTGRES_HOST:5432/YOUR_RENDER_POSTGRES_DB"
       - key: POSTGRES_USER
-        value: "postgres" # Используйте имя пользователя вашей Render Postgres или внешней БД
-
+        value: "YOUR_RENDER_POSTGRES_USER"
       - key: POSTGRES_PASSWORD
-        value: "postgres" # Используйте пароль вашей Render Postgres или внешней БД
-
-      # Hibernate properties (можно переопределить через переменные окружения)
-      # Например, если вы хотите отключить show_sql в production:
-      # - key: SPRING_JPA_SHOW_SQL
-      #   value: "false"
-      # - key: SPRING_JPA_HIBERNATE_DDL_AUTO
-      #   value: "update" # Или "validate" в production
-
-      # Если вы хотите переопределить порт, но Render обычно сам назначает порт
-      # - key: SERVER_PORT
-      #   value: "8085" # На Render порт может быть назначен автоматически.
+        value: "YOUR_RENDER_POSTGRES_PASSWORD"
