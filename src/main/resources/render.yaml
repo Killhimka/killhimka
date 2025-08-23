@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ваше-имя-сервиса
+    name: killhimka
     env: node # Или docker
     runtime: node # Указывает, что это Node.js приложение
     buildCommand: "npm install && npm run build" # Пример для Node.js
