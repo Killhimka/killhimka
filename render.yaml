@@ -5,7 +5,7 @@ services:
     name: killhimka
     runtime: java
     repo: https://github.com/Killhimka/killhimka.git
-    branch: master # Или 'main'
+    branch: main # Или 'main'
 
     # Команда сборки Gradle
     # bootJar создает исполняемый JAR-файл
