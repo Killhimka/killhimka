@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgresql://dpg-d2kvp03ipnbc73fm44lg-a.oregon-postgres.render.com:5432/killhimka
+    url: jdbc:postgresql://dpg-d2kvp03ipnbc73fm44lg-a.oregon-postgres.render.com:5432/killhimka
     username: database_killhimka_user
     password: FmvggcOyEH12f3DMOrqDMRck4Ls2YbXd
 
