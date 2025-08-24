@@ -13,7 +13,7 @@ COPY build.gradle.kts .
 
 # Теперь копируем остальные файлы build.gradle, settings.gradle и т.д.
 # Если они есть в корне
-COPY settings.gradle.kts .
+COPY settings.gradle .
 
 # Копируем весь исходный код
 COPY src ./src
