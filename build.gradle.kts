@@ -40,6 +40,3 @@ tasks.withType<Test> {
 		exclude("**/KillhimkaApplicationTests")
 	}
 }
-tasks.withType<Test> {
-	useJUnitPlatform()
-}
