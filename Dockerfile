@@ -16,13 +16,18 @@ COPY settings.gradle .
 # Копируем исходный код
 COPY src ./src
 
-# Запускаем команду сборки Gradle.
-# Убедись, что версии в build.gradle.kts совместимы с Gradle 8.7 и Java 17!
-RUN gradle build --no-daemon -DskipTests
+# Делаем gradlew исполняемым
+RUN chmod +x gradlew
 
-# --- Финальная стадия (Final Stage) ---
-FROM openjdk:17-jdk-slim
+# Выполняем сборку проекта
+# Здесь мы сразу собираем JAR-файл, который затем будет скопирован в продакшн-образ
+RUN ./gradlew bootJar
 
+# --- Продакшн-образ ---
+# Используем минимальный образ для запуска Java-приложения (например, OpenJDK)
+FROM openjdk:17-jdk-slim AS runner
+
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем JAR-файл. Убедись, что имя файла соответствует действительности.
