@@ -6,7 +6,7 @@ COPY settings.gradle .
 COPY src ./src
 RUN gradle clean build --no-daemon -DskipTests
 
-FROM openjdk:17-jdk-slim
+FROM gradle:jdk17-ubi-minimal
 WORKDIR /app
 COPY --from=builder /app/build/libs/killhimka-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8085
