@@ -18,7 +18,6 @@ COPY settings.gradle .
 # Копируем весь исходный код
 COPY src ./src
 
-# Запускаем команду сборки Gradle.
 # `-DskipTests` пропустит запуск тестов.
 # Если у тебя нет файла build.gradle.kts, а есть build.gradle, то используй:
 # RUN gradle build --no-daemon -DskipTests
