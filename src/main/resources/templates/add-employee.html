@@ -110,13 +110,13 @@
 
                 // Перенаправление на главную страницу списка сотрудников через 1.5 секунды
                 setTimeout(() => {
-                    window.location.href = '/v1/employees';
+                    window.location.href = '/employees';
                 }, 1500);
             } else {
                 responseMessage.textContent = `Saved. ID: ${response.data.id}`;
                 responseMessage.className = 'message success';
                 setTimeout(() => {
-                    window.location.href = '/v1/employees';
+                    window.location.href = '/employees';
                 }, 1500);
             }
 
